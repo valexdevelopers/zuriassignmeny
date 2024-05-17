@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Form</title>
+<style>
+.error { color: red; }
+</style>
+</head>
+<body>
+
+<h2>Simple Form</h2>
+<form id="myForm" method="post" action="submit.php">
+    <label for="firstName">First Name:</label><br>
+    <input type="text" id="firstName" name="firstName" required><br>
+    
+    <label for="lastName">Last Name:</label><br>
+    <input type="text" id="lastName" name="lastName" required><br>
+    
+    <label for="otherNames">Other Names:</label><br>
+    <input type="text" id="otherNames" name="otherNames"><br>
+    
+    <label for="email">Email Address:</label><br>
+    <input type="email" id="email" name="email" required><br>
+    
+    <label for="phone">Phone Number:</label><br>
+    <input type="tel" id="phone" name="phone" minlength="10" maxlength="10" required><br>
+    
+    <label for="gender">Gender:</label><br>
+    <select id="gender" name="gender" required>
+        <option value="">Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+    </select><br>
+    
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    document.getElementById("myForm").addEventListener("submit", function(event) {
+        var firstName = document.getElementById("firstName").value;
+        var lastName = document.getElementById("lastName").value;
+        var otherNames = document.getElementById("otherNames").value;
+        var email = document.getElementById("email").value;
+        var phone = document.getElementById("phone").value;
+        var gender = document.getElementById("gender").value;
+        
+        var errors = [];
+        
+        if (!/^[a-zA-Z]+$/.test(firstName)) {
+            errors.push("First name can only contain letters.");
+        }
+        if (!/^[a-zA-Z]+$/.test(lastName)) {
+            errors.push("Last name can only contain letters.");
+        }
+        if (otherNames && !/^[a-zA-Z\s]+$/.test(otherNames)) {
+            errors.push("Other names can only contain letters and spaces.");
+        }
+        if (!/^[\w.-]+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test(email)) {
+            errors.push("Invalid email address.");
+        }
+        if (!/^\d{10}$/.test(phone)) {
+            errors.push("Phone number must be 10 digits.");
+        }
+        if (gender === "") {
+            errors.push("Gender is required.");
+        }
+        
+        if (errors.length > 0) {
+            event.preventDefault();
+            var errorString = errors.join("<br>");
+            document.getElementById("error").innerHTML = "<div class='error'>" + errorString + "</div>";
+        } else {
+            // If no errors, submit form data to database.json
+            var formData = {
+                firstName: firstName,
+                lastName: lastName,
+                otherNames: otherNames,
+                email: email,
+                phone: phone,
+                gender: gender
+            };
+    
+            // Using AJAX to send form data to the server
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "submit.php", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    console.log("Form data submitted successfully!");
+                    // Optionally, you can redirect the user to another page upon successful submission
+                    window.location.href = "success.html";
+                }
+            };
+            xhr.send(JSON.stringify(formData));
+        }
+    });
+    </script>
+    
+<div id="error"></div>
+
+</body>
+</html>
